@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../models/pengajuan_model.dart';
 import '../pages/beranda_page.dart';
 import '../pages/layanan_page.dart';
 import '../pages/warga_page.dart';
@@ -46,9 +48,7 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
         foregroundColor: Colors.white,
         title: const Text(
           'NUSANTARA CERDAS',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -67,10 +67,7 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
             padding: EdgeInsets.fromLTRB(28, 24, 16, 16),
             child: Text(
               'Menu Utama',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -96,10 +93,7 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
             padding: EdgeInsets.fromLTRB(28, 24, 16, 8),
             child: Text(
               'Menu Pendukung',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -126,9 +120,7 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
               Navigator.pop(context);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Menu Keluar dipilih'),
-                ),
+                const SnackBar(content: Text('Menu Keluar dipilih')),
               );
             },
           ),
@@ -154,16 +146,14 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
                   label: Text('Layanan'),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.people_outline),
-                  selectedIcon: Icon(Icons.people),
-                  label: Text('Warga'),
+                  icon: const IkonWargaDenganBadge(terpilih: false),
+                  selectedIcon: const IkonWargaDenganBadge(terpilih: true),
+                  label: const Text('Warga'),
                 ),
               ],
             ),
 
-          Expanded(
-            child: halaman[_indexAktif],
-          ),
+          Expanded(child: halaman[_indexAktif]),
         ],
       ),
 
@@ -184,12 +174,31 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
                   label: 'Layanan',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.people_outline),
-                  selectedIcon: Icon(Icons.people),
+                  icon: const IkonWargaDenganBadge(terpilih: false),
+                  selectedIcon: const IkonWargaDenganBadge(terpilih: true),
                   label: 'Warga',
                 ),
               ],
             ),
+    );
+  }
+}
+
+class IkonWargaDenganBadge extends StatelessWidget {
+  const IkonWargaDenganBadge({super.key, required this.terpilih});
+
+  final bool terpilih;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = context.select<PengajuanModel, int>(
+      (model) => model.totalPengajuan,
+    );
+
+    return Badge(
+      isLabelVisible: total > 0,
+      label: Text('$total'),
+      child: Icon(terpilih ? Icons.people : Icons.people_outline),
     );
   }
 }

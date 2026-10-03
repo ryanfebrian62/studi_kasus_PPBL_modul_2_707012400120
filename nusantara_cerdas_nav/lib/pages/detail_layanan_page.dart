@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class DetailLayananPage extends StatelessWidget {
+import '../models/pengajuan_model.dart';
+
+class DetailLayananPage extends StatefulWidget {
   const DetailLayananPage({
     super.key,
     required this.nama,
@@ -15,6 +18,38 @@ class DetailLayananPage extends StatelessWidget {
   final String keterangan;
 
   @override
+  State<DetailLayananPage> createState() => _DetailLayananPageState();
+}
+
+class _DetailLayananPageState extends State<DetailLayananPage> {
+  bool _sedangMengirim = false;
+
+  Future<void> _ajukanPermohonan() async {
+    setState(() {
+      _sedangMengirim = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (!mounted) return;
+
+    context.read<PengajuanModel>().tambahPengajuan(
+          widget.nama,
+        );
+
+    setState(() {
+      _sedangMengirim = false;
+    });
+
+    Navigator.pop(
+      context,
+      'Permohonan "${widget.nama}" berhasil diajukan.',
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -23,7 +58,6 @@ class DetailLayananPage extends StatelessWidget {
         title: const Text('Detail Layanan'),
         centerTitle: true,
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -38,7 +72,7 @@ class DetailLayananPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              nama,
+              widget.nama,
               style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -47,13 +81,14 @@ class DetailLayananPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            Text(
+            const Text(
               'Dinas Penanggung Jawab',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(dinas),
+
+            Text(widget.dinas),
 
             const SizedBox(height: 16),
 
@@ -63,7 +98,8 @@ class DetailLayananPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(jam),
+
+            Text(widget.jam),
 
             const SizedBox(height: 16),
 
@@ -73,7 +109,8 @@ class DetailLayananPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(keterangan),
+
+            Text(widget.keterangan),
 
             const Spacer(),
 
@@ -81,19 +118,24 @@ class DetailLayananPage extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    'Permohonan "$nama" berhasil diajukan.',
-                  );
-                },
+                onPressed:
+                    _sedangMengirim ? null : _ajukanPermohonan,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text(
-                  'Ajukan Permohonan',
-                ),
+                child: _sedangMengirim
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Ajukan Permohonan',
+                      ),
               ),
             ),
           ],

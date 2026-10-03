@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/favorit_model.dart';
 
 class LayananPage extends StatelessWidget {
   const LayananPage({super.key});
@@ -22,11 +24,9 @@ class LayananPage extends StatelessWidget {
     );
 
     if (hasil != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(hasil.toString()),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(hasil.toString())));
     }
   }
 
@@ -37,20 +37,29 @@ class LayananPage extends StatelessWidget {
     required String jam,
     required String keterangan,
   }) {
+    final favorit = context.watch<FavoritModel>();
+    final isFavorit = favorit.isFavorit(nama);
+
     return Card(
       child: ListTile(
-        leading: const Icon(
-          Icons.description,
-          color: Colors.blue,
-        ),
-        title: Text(
-          nama,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
+        leading: const Icon(Icons.description, color: Colors.blue),
+        title: Text(nama, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(dinas),
+        trailing: IconButton(
+          onPressed: () {
+            final model = context.read<FavoritModel>();
+
+            if (model.isFavorit(nama)) {
+              model.batalTandai(nama);
+            } else {
+              model.tandai(nama);
+            }
+          },
+          icon: Icon(
+            isFavorit ? Icons.star : Icons.star_border,
+            color: isFavorit ? Colors.amber : Colors.grey,
           ),
         ),
-        subtitle: Text(dinas),
-        trailing: const Icon(Icons.arrow_forward_ios),
         onTap: () {
           _bukaDetail(
             context,
@@ -76,10 +85,7 @@ class LayananPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Layanan Publik',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -112,16 +118,14 @@ class LayananPage extends StatelessWidget {
                       nama: 'Izin Bangunan',
                       dinas: 'Dinas PUPR',
                       jam: '08.00 - 15.00',
-                      keterangan:
-                          'Layanan pengurusan izin bangunan.',
+                      keterangan: 'Layanan pengurusan izin bangunan.',
                     ),
                     _itemLayanan(
                       context,
                       nama: 'Izin Reklame',
                       dinas: 'DPMPTSP',
                       jam: '08.00 - 16.00',
-                      keterangan:
-                          'Layanan pengajuan izin pemasangan reklame.',
+                      keterangan: 'Layanan pengajuan izin pemasangan reklame.',
                     ),
                   ],
                 ),
@@ -134,8 +138,7 @@ class LayananPage extends StatelessWidget {
                       nama: 'Pendaftaran Puskesmas',
                       dinas: 'Dinas Kesehatan',
                       jam: '08.00 - 14.00',
-                      keterangan:
-                          'Layanan pendaftaran kunjungan puskesmas.',
+                      keterangan: 'Layanan pendaftaran kunjungan puskesmas.',
                     ),
                     _itemLayanan(
                       context,
@@ -150,8 +153,7 @@ class LayananPage extends StatelessWidget {
                       nama: 'Konsultasi Kesehatan',
                       dinas: 'Dinas Kesehatan',
                       jam: '08.00 - 15.00',
-                      keterangan:
-                          'Layanan konsultasi kesehatan masyarakat.',
+                      keterangan: 'Layanan konsultasi kesehatan masyarakat.',
                     ),
                   ],
                 ),
@@ -164,8 +166,7 @@ class LayananPage extends StatelessWidget {
                       nama: 'Informasi Angkutan Umum',
                       dinas: 'Dinas Perhubungan',
                       jam: '08.00 - 16.00',
-                      keterangan:
-                          'Informasi rute dan jadwal angkutan umum.',
+                      keterangan: 'Informasi rute dan jadwal angkutan umum.',
                     ),
                     _itemLayanan(
                       context,
